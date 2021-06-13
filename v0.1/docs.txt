@@ -1,0 +1,66 @@
+Жанр: Песочница
+Цель игры:
+    Выживание: Пусто(Ещё нет идей)
+    Креатив: Строить(Блоки разные)
+Мобы: Будут
+Инвентарь: Будет
+
+Классы игры:
+    Player:
+        attributes:
+            x - координата игрка "X"
+            y - координата игрка "Y"
+            change_x - изменитель переменной x
+            change_y - изменитель переменной y
+            rect - хитбокс игрока
+            image - изображение игрока
+        methods:
+            __init__(self, x, y, img=None, size=(1, 2)) - инициализация атрибутов
+            update(self, chank.sprite.Group) - обнавление всего
+            jump(self, chank.sprite.Group) - прыжок
+            move(self, chank.sprite.Group) - движение
+            collision(self, chank) - колизия
+            cmove(self, x, y) - коректировка после колизии
+            grav(self, chank) - гравитация
+
+    Mouse:
+        attributes:
+            bad - цвет где нельзя поставить блок
+            good - цвет где можно поставить блок
+            screen - экран
+            player - объект Player (координаты X и Y)
+        methods:
+            __init__(self, bad, good, screen, player) - инициализация атрибутов
+            block(self) - показывает блок, с которым можно взаимодействовать (или нельзя если цвет "bad")
+            select(self, chank) - возвращяет координаты блока, с которым можно взаимодействовать
+            set_block(self, chank) - ставит блоки
+            del_block(self, chank) - ломает блоки
+
+    Block:
+        attributes:
+            image - текстура блока
+            rect - хитбокс блока
+            x - координата "X"
+            y - координата "Y"
+            player - объект Player (координаты X и Y)
+        methods:
+            __init__(self, x, y, player, texture=None) - инициализация атрибутов
+            update(self) - обнавление всего
+
+Будет добавленно:
+    Система чанков
+    Предметы (class Item)
+    Мобы (class Mob)
+    Текстуры
+    Креатив (Творческий режим)
+    Выжывание
+    Генерация мира
+    Инвентарь (class Inventory)
+    Меню (class Menu, новое)
+
+Добавленно:
+    Полностью:
+        Система "Ставить и ломать блоки"
+        Игрок (class Player)
+    Делается:
+        Блоки (class Block)

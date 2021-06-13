@@ -1,0 +1,7 @@
+Air  bedrock.png  None  None
+Dirt  dirt.png  block
+Grass  grass.png  block
+Stone  stone.png  block
+Cobblestone  cobblestone.png  block
+Bedrock  bedrock.png  block
+Cobblestone HB  cobblestone.png  block  HB

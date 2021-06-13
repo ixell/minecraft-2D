@@ -1,0 +1,221 @@
+Жанр: Песочница
+Цель игры:
+    Выживание: Выживать
+    Креатив: Строить
+Блоки: Есть
+Мобы: Есть
+Инвентарь: Будет
+
+Пакет module:
+    Настройки (settings.py):
+        Display:
+            WSIZE - размер экрана
+            WWIDTH - ширина экрана
+            WHEIGHT - высота экрана
+        Colors:
+            WHITE - белый
+            BLACK - чёрный
+            GRAY - серый
+            RED - красный
+            GREEN - зелёный
+            BLUE - синий
+            YELLOW - жёлтый
+            BROWN - коричневый
+        Game:
+            BSIZE - размер блока (в пикселях)
+            CSIZE - размер чанка (в блоках)
+            ISIZE - размер предмета (в пикселях)
+
+    Классы игры:
+        Main:
+            attributes:
+                screen - окно с игрой
+                clock - объект Clock из pygame.time
+                player - объект Player
+                chanks - список всех чанков
+                clchank - объект Chank
+                chank - объект Group из pygame.sprite, получен методом get_group() из объекта Chank
+                clchank2, chank2 - второй прогруженный чанк
+                mouse - объект Mouse
+            methods:
+                __init__(self) - инициализация атрибутов
+                play(self) - выполняет игровые функции
+                generate(self) - генерирует мир
+                set_chank(self) - создаёт или пересоздаёт атрибуты chank и clchank
+                draw(self) - рисует нужные объекты
+                run(self) - главный цикл
+
+        Player:
+            attributes:
+                x - координата игрка "X"
+                y - координата игрка "Y"
+                change_x - изменитель переменной x
+                change_y - изменитель переменной y
+                rect - хитбокс игрока
+                head - спрайт головы
+                body - спрайт тела
+                lhand - спрайт левой руки
+                rhand - спрайт правой руки
+                lleg - спрайт левой ноги
+                rleg - спрайт правой ноги
+                images - все спрайты игрока
+                rots - словарь значений для поворота частей тела для ходьбы
+                direction - индекс граппы спрайтов
+            methods:
+                __init__(self, x, y, img=None, size=(1, 2)) - инициализация атрибутов
+                update(self, chank.sprite.Group) - обнавление Player
+                jump(self, chank.sprite.Group) - прыжок
+                move(self, chank.sprite.Group) - движение
+                collision(self, chank) - колизия
+                cmove(self, x, y) - коректировка после колизии
+                grav(self, chank) - гравитация
+                sprites_move_to(self, pos, orig=False) - перемещает спрайты в указаную позицию
+                sprites_rotate(self) - анимация ходьбы
+                sprites_move(self, pos) - перемещает спрайты на указаное кол-во пикселей
+                resprite(self, num) - выбирает спрайты по индексу для всех спрайтов
+                back(self, rotate) - поворачивает спрайты в сторону, куда идёт игрок
+
+        Mouse:
+            attributes:
+                bad - цвет где нельзя поставить блок
+                good - цвет где можно поставить блок
+                screen - экран
+                player - объект Player (координаты X и Y)
+                chanks - аттрибут chanks из Main
+            methods:
+                __init__(self, bad, good, screen, player) - инициализация атрибутов
+                block(self) - показывает блок, с которым можно взаимодействовать (или нельзя если цвет "bad")
+                select(self) - возвращяет координаты блока, с которым можно взаимодействовать
+                set_block(self) - ставит блоки
+                del_block(self, items) - ломает блоки
+
+        Block:
+            attributes:
+                image - текстура блока
+                rect - хитбокс блока
+                x - координата "X"
+                y - координата "Y"
+                player - объект Player (координаты X и Y)
+                destructible - разрушаемость блока
+            methods:
+                __init__(self, x, y, player, texture=None) - инициализация атрибутов
+                update(self) - обнавление всего
+        
+        Grass(Block):
+            Блок травы
+        
+        Dirt(Block):
+            Блок земли
+        
+        Stone(Block):
+            Блок камня
+        
+        Bedrock(Block):
+            блок бедрока (неломаемый)
+        
+        Cobblestone(Block):
+            блок булыжника
+        
+        Chank:
+            attributes:
+                map - объект Group из pygame.sprite, позиция блоков чанков
+            methods:
+                __init__(self, generation) - инициализация атрибутов
+                get_group(self) - возвращяет объект Group из pygame.sprite
+                change_pos(self, move_x=0, move_y=0) - смещает чанк по сетке чанков
+                copy(self) - возвращяет копию чанка и всех спрайтов в ней
+            
+        Item:
+            attributes:
+                image - изображение предмета
+                rect - хитбокс предмета
+                x - координата X
+                y - координата Y
+                player - объект Player
+                name - Название предмета
+                change_y - изменитель переменной y
+                s - изменитель переменной change_y
+                take - этот предмет можно взять, если take == True
+            methods:
+                __init__(self, x, y, player, image, name, take) - инициализация атрибутов
+                update(self) - двигает предмет
+                collision(self) - вызывается тогда, когда игрок каснётся предмета
+
+        TestItem(Item):
+            Жёлтый предмет, при прикосновенни с которым вас подкидывают вверх
+        
+        Mob:
+            attributes:
+                image - изображение моба
+                rect - хитбокс моба
+                x - координата X
+                y - координата Y
+                change_x - изменитель переменной x
+                change_y - изменитель переменной y
+                player - объект Player
+            methods:
+                __init__(self, x, y, player, size=(2, 1)) - инициализация атрибутов
+                update(self, chank1, chank2, chanks) - начинает двигать моба
+                move(self, chank) - двигает моба
+                jump(self, chank) - прыжок
+                collision(self, chank) - колизия
+                cmove(self, x, y) - коректировка после колизии
+                grav(self, chank) - гравитация
+        
+        Image:
+            attributes:
+                image - изображение
+                rect - хитбокс
+            methods:
+                __init__(self, image, pos) - инициализация атрибутов
+                move_to(self, pos) - место, куда переместится изображение
+
+Пакет Files:
+    Папка Textures:
+        dirt.png - картинка земли
+        stone.png - картинка камня
+        cobblestone.png - картинка булыжника
+        grass.png - картинка травы
+        bedrock.png - картинка бедрока
+    __init__ - инициализация пакета
+    blocks.txt - данные о блоках
+
+Файлы:
+    files:
+        textures:
+            dirt.png
+            stone.png
+            cobblestone.png
+            grass.png
+            bedrock.png
+        __init__.py
+        blocks.txt
+    module:
+        __init__.py
+        docs.txt
+        objects.py
+        settings.py
+    docs.txt
+    main.py
+
+Будет добавленно:
+    Неполные блоки v0.6
+    Инвентарь (class Inventory) v0.6
+    Креатив (Творческий режим) v0.7
+    Выжывание v0.8
+    Сохранение мира v0.9
+    Меню (class Menu, новое) v0.9
+    Исправление ошибок v1.0
+
+Добавленно:
+    Система "Ставить и ломать блоки" v0.1
+    Игрок (class Player) v0.1
+    Блоки (class Block, готово на 65%) v0.1 - v0.2
+    Система чанков (class Chank) v0.2
+    Предметы (class Item) v0.3
+    Мобы (class Mob, 85%) v0.4
+    файлы v0.5
+    Текстуры v0.5
+
+Делается:
+    Ничего ...

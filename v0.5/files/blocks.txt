@@ -1,0 +1,5 @@
+Dirt = dirt.png
+Grass = grass.png
+Stone = stone.png
+CobbleStone = cobblestone.png
+Bedrock = bedrock.png

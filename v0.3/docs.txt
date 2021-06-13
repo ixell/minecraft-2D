@@ -1,0 +1,145 @@
+Жанр: Песочница
+Цель игры:
+    Выживание: Пусто(Ещё нет идей)
+    Креатив: Строить(Блоки разные)
+Мобы: Будут
+Инвентарь: Будет
+
+Constants:
+    Display:
+        WSIZE - размер экрана
+        WWIDTH - ширина экрана
+        WHEIGHT - высота экрана
+    Colors:
+        WHITE - белый
+        BLACK - чёрный
+        GRAY - серый
+        RED - красный
+        GREEN - зелёный
+        BLUE - синий
+        YELLOW - жёлтый
+        BROWN - коричневый
+    Game:
+        BSIZE - размер блока (в пикселях)
+        CSIZE - размер чанка (в блоках)
+        ISIZE - размер предмета (в пикселях)
+
+Классы игры:
+    Main:
+        attributes:
+            screen - окно с игрой
+            clock - объект Clock из pygame.time
+            player - объект Player
+            chanks - список всех чанков
+            clchank - объект Chank
+            chank - объект Group из pygame.sprite, получен методом get_group() из объекта Chank
+            clchank2, chank2 - второй прогруженный чанк
+            mouse - объект Mouse
+        methods:
+            __init__(self) - инициализация атрибутов
+            play(self) - выполняет игровые функции
+            generate(self) - генерирует мир
+            set_chank(self) - создаёт или пересоздаёт атрибуты chank и clchank
+            draw(self) - рисует нужные объекты
+            run(self) - главный цикл
+
+    Player:
+        attributes:
+            x - координата игрка "X"
+            y - координата игрка "Y"
+            change_x - изменитель переменной x
+            change_y - изменитель переменной y
+            rect - хитбокс игрока
+            image - изображение игрока
+        methods:
+            __init__(self, x, y, img=None, size=(1, 2)) - инициализация атрибутов
+            update(self, chank.sprite.Group) - обнавление всего
+            jump(self, chank.sprite.Group) - прыжок
+            move(self, chank.sprite.Group) - движение
+            collision(self, chank) - колизия
+            cmove(self, x, y) - коректировка после колизии
+            grav(self, chank) - гравитация
+
+    Mouse:
+        attributes:
+            bad - цвет где нельзя поставить блок
+            good - цвет где можно поставить блок
+            screen - экран
+            player - объект Player (координаты X и Y)
+            chanks - аттрибут chanks из Main
+        methods:
+            __init__(self, bad, good, screen, player) - инициализация атрибутов
+            block(self) - показывает блок, с которым можно взаимодействовать (или нельзя если цвет "bad")
+            select(self) - возвращяет координаты блока, с которым можно взаимодействовать
+            set_block(self) - ставит блоки
+            del_block(self, items) - ломает блоки
+
+    Block:
+        attributes:
+            image - текстура блока
+            rect - хитбокс блока
+            x - координата "X"
+            y - координата "Y"
+            player - объект Player (координаты X и Y)
+            destructible - разрушаемость блока
+        methods:
+            __init__(self, x, y, player, texture=None) - инициализация атрибутов
+            update(self) - обнавление всего
+    
+    Grass(Block):
+        Зелёный объект Block
+    
+    Dirt(Block):
+        Коричневый объект Block
+    
+    Stone(Block):
+        Серый объект Block
+    
+    Unbreakable(Block):
+        Неломаемый, чёрный объект Block
+    
+    Chank:
+        attributes:
+            map - объект Group из pygame.sprite, позиция блоков чанков
+        methods:
+            __init__(self, generation) - инициализация атрибутов
+            get_group(self) - возвращяет объект Group из pygame.sprite
+            change_pos(self, move_x=0, move_y=0) - смещает чанк по сетке чанков
+            copy(self) - возвращяет копию чанка и всех спрайтов в ней
+        
+    Item:
+        attributes:
+            image - изображение предмета
+            rect - хитбокс предмета
+            x - координата X
+            y - координата Y
+            player - объект Player
+            name - Название предмета
+            change_y - изменитель переменной y
+            s - изменитель переменной change_y
+            take - этот предмет можно взять, если take == True
+        methods:
+            update(self) - двигает предмет
+            collision(self) - вызывается тогда, когда игрок каснётся предмета
+
+    TestItem(Item):
+        Item, при прикосновенни с которым вас подкидывают вверх
+
+Будет добавленно:
+    Мобы (class Mob) v0.4
+    Текстуры v0.5
+    Неполные блоки v0.6
+    Инвентарь (class Inventory) v0.7
+    Креатив (Творческий режим) v0.8
+    Выжывание v0.9
+    Меню (class Menu, новое) v1.0
+
+Добавленно:
+    Система "Ставить и ломать блоки" v0.1
+    Игрок (class Player) v0.1
+    Блоки (class Block, готово на 65%) v0.1 - v0.2
+    Система чанков (class Chank) v0.2
+    Предметы (class Item) v0.3
+
+Делается:
+    Ничего ...
