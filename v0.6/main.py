@@ -82,8 +82,8 @@ class Main:
         taked = pg.sprite.spritecollide(self.player, self.items, False, False)
         for item in taked:
             if item.take:
-                self.items.remove(item)
-                item.collision()
+                if item.collision():
+                    self.items.remove(item)
 
     def draw(self):
         self.screen.fill(WHITE)
@@ -124,12 +124,6 @@ class Main:
                     if event.key == pg.K_e:
                         self.inventory.OO()
                 self.hotbar.choice(event)
-
-            # pr = pg.mouse.get_pressed()
-            # if pr[0]:
-            #     self.mouse.set_block()
-            # elif pr[2]:
-            #     self.mouse.del_block()
             self.play()
             self.draw()
             self.clock.tick(FPS)

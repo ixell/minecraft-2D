@@ -362,7 +362,7 @@ class Item(pg.sprite.Sprite):
         self.rect.y += 8
 
     def collision(self):
-        self.player.inventory.add(self.id, 1)
+        return self.player.inventory.add(self.id, 1)
 
 
 class TestItem(Item):

@@ -20,11 +20,14 @@ class Slot:
             hb_mode = True
         self.rect = self.image.get_rect()
         self.count = count
-    
+
     def normalize(self):
-        if self.count <= 0: self.id = 0
+        if self.count <= 0:
+            self.id = 0
+            self.reID(0)
         if self.count > 64: self.count = 64
-    
+        if self.id == 0: self.count = 0
+
     def reID(self, new_id):
         self.id = new_id
         self.line = items[self.id].strip().split('  ')
@@ -56,7 +59,7 @@ class HotBar:
         self.hotslot = 0
         self.font = pg.font.SysFont(None, 20)
         self.set(6, 8, 5)
-    
+
     def draw(self):
         self.image = self.original_image.copy()
         self.image.blit(self.hotslot_image, (self.hotslot * self.xwidth, 0))
@@ -67,13 +70,13 @@ class HotBar:
                 crect = count.get_rect()
                 self.image.blit(count, (x * self.xwidth + self.width - crect.width - 10, self.width - crect.height - 5))
         self.screen.blit(self.image, self.pos)
-    
+
     def rms(self, method:str, *values):
         ret = {}
         for index, slot in enumerate(self.slots):
             ret[index] = slot.__getattribute__(method)(*values)
         return ret
-    
+
     def choice(self, event):
         if event.type == pg.KEYDOWN:
             if str(chr(event.key)) in ('1', '2', '3', '4', '5', '6', '7', '8', '9'):
@@ -83,7 +86,7 @@ class HotBar:
                 self.hotslot = (self.hotslot+1)%9
             elif event.button == 4:
                 self.hotslot = (self.hotslot-1) if self.hotslot-1 > -1 else 8
-    
+
     def clear(self, count:int=-1, slot='useing'):
         if slot.__class__ != int: slot = self.hotslot
         if count > -1:
@@ -91,18 +94,19 @@ class HotBar:
         else:
             self.slots[slot].count = 0
             self.slots[slot].id = 0
-    
+
     def set(self, id:int, slot:int, count:int=1):
         self.slots[slot].reID(id)
         self.slots[slot].count = count
-    
+
     def normalize(self):
         self.rms('normalize')
-    
+
     def get_hotslot(self):
         return self.slots[self.hotslot]
-    
+
     def add(self, id:int, count:int=1):
+        first = count
         for slot in self.slots:
             if slot.use == 'block':
                 if slot.id == id and slot.count < 64:
@@ -117,6 +121,8 @@ class HotBar:
                 slot.reID(id)
                 slot.count = count
                 return True
+        if first != count:
+            return count
         return False
 
 class Inventory:
@@ -134,25 +140,28 @@ class Inventory:
         {'head':Slot(0), 'legs':Slot(0), 'chest':Slot(0), 'feet':Slot(0)}} # head - голова, legs - штаны, chest - нагрудник, feet - ботинки
         self.width = 36
         self.font = self.hotbar.font
-        self.move_slot = None
+        self.move_slot = Slot(0)
+        self.move_slot.last = None
 
     def set(self, id:int, slot:int, count:int=1):
         self.slots['inventory'][slot].reID(id)
         self.slots['inventory'][slot].count = count
     
     def add(self, id:int, count:int=1):
-        if self.hotbar.add(id, count): return True
-        else:
-            for slot in self.slots['inventory']:
-                if slot.use == 'block':
-                    if slot.id == id and slot.count < 64:
-                        slot.count += count
-                        return True
-            for slot in self.slots['inventory']:
-                if slot.id == 0:
-                    slot.reID(id)
-                    slot.count = count
+        hb = self.hotbar.add(id, count)
+        if hb: return True
+        elif hb._class__ == int: count = hb
+        for slot in self.slots['inventory']:
+            if slot.use == 'block':
+                if slot.id == id and slot.count < 64:
+                    slot.count += count
                     return True
+        for slot in self.slots['inventory']:
+            if slot.id == 0:
+                slot.reID(id)
+                slot.count = count
+                return True
+        return False
 
     def open(self):
         self.active = True
@@ -160,7 +169,7 @@ class Inventory:
     def close(self):
         self.move_slot = None
         self.active = False
-    
+
     def OO(self):
         if self.active: self.close()
         else: self.open()
@@ -189,13 +198,13 @@ class Inventory:
                     pos = (24, y*36 + 24)
                     self.image.blit(slot.image, pos)
             self.screen.blit(self.image, self.pos)
-            if self.move_slot != None:
+            if self.move_slot.last != None:
                 mpos = pg.mouse.get_pos()
                 self.screen.blit(self.move_slot.image,
                  (mpos[0] + self.move_slot.rect.w + 3,
                  mpos[1] + self.move_slot.rect.h + 3))
 
-    def move(self, halfmode=False):
+    def move(self, rc=False):
         if self.active:
             mpos = pg.mouse.get_pos()
             slot_x = (mpos[0] - 12 - self.pos[0]) // 36
@@ -206,26 +215,64 @@ class Inventory:
                 slot = (mpos[0] - 12 - self.pos[0]) // 36
                 if not 0 <= slot < 9 or not 278 <= mpos[1]-self.pos[1] <= 314: slot = None
                 else: slot = self.slots['hotbar'][slot]
-            if self.move_slot == None:
-                if slot != None and slot.id != 0: self.move_slot = slot
+            if self.move_slot.last == None:
+                if slot != None and slot.id != 0:
+                    self.move_slot.reID(slot.id)
+                    self.move_slot.last = slot
+                    if rc and slot.count > 1:
+                        self.move_slot.count = slot.count//2
+                        slot.count -= self.move_slot.count
+                    else:
+                        self.move_slot.count = slot.count
+                        slot.reID(0)
             elif slot != None:
-                if slot == self.move_slot:
-                    self.move_slot = None
-                    return
-                if slot.id == self.move_slot.id:
-                    slot.count += self.move_slot.count
-                    self.move_slot.count = slot.count - 64 if slot.count - 64 > 0 else 0
-                    self.move_slot.normalize()
-                    slot.normalize()
+                if slot == self.move_slot.last:
+                    if rc:
+                        if slot.id == 0: slot.reID(self.move_slot.id)
+                        else: slot.count += 1
+                        self.move_slot.count -= 1
+                        self.move_slot.normalize()
+                        if self.move_slot.id == 0: self.move_slot.last = None
+                        return
+                    else:
+                        if slot.id == 0: slot.reID(self.move_slot.id)
+                        else: slot.count += 1
+                        slot.count = self.move_slot.count + slot.count - 1
+                elif slot.id == self.move_slot.id:
+                    if rc:
+                        self.move_slot.count -= 1
+                        slot.count += 1
+                        self.move_slot.normalize()
+                        if self.move_slot.id == 0: self.move_slot.last = None
+                    else:
+                        slot.count += self.move_slot.count
+                        self.move_slot.last.reID(self.move_slot.id)
+                        self.move_slot.last.count = slot.count - 64 if slot.count - 64 > 0 else 0
+                        self.move_slot.last.normalize()
+                        slot.normalize()
                 else:
                     save = (slot.id, slot.count)
+                    if rc and save[0] == 0:
+                        slot.reID(self.move_slot.id)
+                        self.move_slot.count -= 1
+                        self.move_slot.normalize()
+                        if self.move_slot.id == 0: self.move_slot.last = None
+                        return
                     slot.reID(self.move_slot.id)
                     slot.count = self.move_slot.count
-                    self.move_slot.reID(save[0])
-                    self.move_slot.count = save[1]
-                self.move_slot = None
+                    if self.move_slot.last.id == 0:
+                        self.move_slot.last.reID(save[0])
+                        self.move_slot.last.count = save[1]
+                    elif save[0] != 0:
+                        slot.reID(0)
+                        slot.normalize()
+                        self.move_slot.last = slot
+                        self.move_slot.reID(save[0])
+                        self.move_slot.count = save[1]
+                        return
+                self.move_slot.last = None
             else:
-                self.move_slot = None
+                self.move_slot.last = None
 
 if __name__ == '__main__':
     pg.init()
@@ -240,7 +287,7 @@ if __name__ == '__main__':
                 run = False
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if event.button == 1: inv.move()
-                elif event.button == 2: inv.move(True)
+                elif event.button == 3: inv.move(True)
         inv.draw()
         pg.display.update()
     pg.quit()
