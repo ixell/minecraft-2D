@@ -146,9 +146,6 @@
                 __init__(self, x, y, player, image, name, take) - инициализация атрибутов
                 update(self) - двигает предмет
                 collision(self) - вызывается тогда, когда игрок каснётся предмета
-
-        TestItem(Item):
-            Жёлтый предмет, при прикосновенни с которым вас подкидывают вверх
         
         Mob:
             attributes:

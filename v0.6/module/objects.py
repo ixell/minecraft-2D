@@ -92,6 +92,7 @@ class Player(pg.sprite.Sprite):
             self.body.rect.width,
             self.head.rect.height + self.body.rect.height + self.lleg.rect.height)
         self.rots = {'lhand': [0, -1], 'rhand': [0, 1], 'lleg': [0, -1], 'rleg': [0, 1]}
+        self.speed = PSPE
 
     def sprites_move_to(self, pos, orig=False):
         if self.direction in (0, 2):
@@ -181,14 +182,14 @@ class Player(pg.sprite.Sprite):
         self.head.image = pg.transform.flip(self.head.original_image, rotate, False)
 
     def move(self, chank):
-        self.grav(chank)
+        self.grav()
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_RIGHT] or keys[pg.K_a] or keys[pg.K_d]:
             if keys[pg.K_RIGHT] or keys[pg.K_d]:
-                self.change_x += 8
+                self.change_x += self.speed
                 self.back(False)
             if keys[pg.K_LEFT] or keys[pg.K_a]:
-                self.change_x -= 8
+                self.change_x -= self.speed
                 self.back(True)
             self.sprites_rotate()
         else:
@@ -203,16 +204,18 @@ class Player(pg.sprite.Sprite):
         x, y = (self.rect.x, self.rect.y)
         self.rect.x += self.change_x
         bhl = pg.sprite.spritecollide(self, chank, False)
+        cb = False
         if bool(bhl):
             self.rect.x = x
             if not bool(pg.sprite.spritecollide(self, chank, False)):
                 obj = bhl[0]
                 if self.change_x > 0:
+                    cb = obj.collision(self, 'x+')
                     self.rect.right = obj.rect.left
                 else:
+                    cb = obj.collision(self, 'x-')
                     self.rect.left = obj.rect.right
-            else:
-                self.change_x = 0
+        cb = False
         self.rect.y -= self.change_y
         bhl = pg.sprite.spritecollide(self, chank, False)
         if bool(bhl):
@@ -220,13 +223,14 @@ class Player(pg.sprite.Sprite):
             if not bool(pg.sprite.spritecollide(self, chank, False)):
                 obj = bhl[0]
                 if self.change_y > 0:
+                    cb = obj.collision(self, 'y-')
                     self.rect.top = obj.rect.bottom
-                    self.change_y *= -0.25
+                    if not cb: self.change_y *= -0.25
                 else:
+                    cb = obj.collision(self, 'y+')
                     self.rect.bottom = obj.rect.top
-                    self.change_y = 0
-            else:
-                self.change_y = 0
+                    if not cb: self.change_y = 0
+            if not cb: self.change_y = 0
         cx = self.rect.x - x
         cy = self.rect.y - y
         self.cmove(cx, cy)
@@ -237,7 +241,7 @@ class Player(pg.sprite.Sprite):
         self.x -= x
         self.y -= y
 
-    def grav(self, chank):
+    def grav(self):
         if self.change_y == 0:
             self.change_y = -1
         else:
@@ -246,7 +250,7 @@ class Player(pg.sprite.Sprite):
 
         if self.y - self.lleg.rect.height <= 0:
             self.y = self.lleg.rect.height
-            self.change_y = 0
+            self.change_y = PSPE
 
 
 class Block(pg.sprite.Sprite):
@@ -272,8 +276,8 @@ class Block(pg.sprite.Sprite):
         copy = self.__class__(self.x, self.y, self.player)
         return copy
 
-    def collision(self):
-        pass
+    def collision(self, mob, coord):
+        return False
 
 
 class Grass(Block):
@@ -305,6 +309,16 @@ class CobbleStoneHB(Block):
     def __init__(self, x, y, player):
         image = files.blocks['CobbleStone']
         super().__init__(x, y, player, image, 6, size=(1, 0.5), hb_mode=True)
+
+class SlimeBlock(Block):
+    def __init__(self, x, y, player):
+        image = files.blocks['SlimeBlock']
+        super().__init__(x, y, player, image, 7)
+    
+    def collision(self, mob, coord):
+        if 'y' in coord: mob.change_y *= -0.5
+        mob.speed = 4
+        return True
 
 
 class Chank:
@@ -417,9 +431,16 @@ class ItemCobbleStoneHB(Item):
         image = pg.image.load(image).subsurface((0, 0, ISIZE, ISIZE//2)).convert_alpha()
         super().__init__(x, y, player, image, name, take, id=id)
 
+class ItemSlimeBlock(Item):
+    def __init__(self, x, y, player, name='slime block', take=True):
+        id = 7
+        image = 'files/textures/' + items[id].split('  ')[1]
+        image = pg.image.load(image).convert_alpha()
+        super().__init__(x, y, player, image, name, take, id=id)
+
 
 class Mob(pg.sprite.Sprite):
-    def __init__(self, x, y, player, size=(2, 1)):
+    def __init__(self, x, y, player, speed, size=(2, 1)):
         super().__init__()
         self.image = pg.Surface((size[0]*BSIZE, size[1]*BSIZE))
         self.rect = self.image.get_rect()
@@ -428,6 +449,7 @@ class Mob(pg.sprite.Sprite):
         self.change_x = 0
         self.change_y = 0
         self.player = player
+        self.speed = speed
 
     def update(self, chank1, chank2, chanks):
         self.rect.x = self.player.x + self.x + self.change_x

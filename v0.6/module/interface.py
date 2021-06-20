@@ -58,7 +58,6 @@ class HotBar:
         self.hotslot_image = pg.transform.scale(self.hotslot_image, (50, 50))
         self.hotslot = 0
         self.font = pg.font.SysFont(None, 20)
-        self.set(6, 8, 5)
 
     def draw(self):
         self.image = self.original_image.copy()
@@ -104,9 +103,19 @@ class HotBar:
 
     def get_hotslot(self):
         return self.slots[self.hotslot]
+    
+    def add_air(self, id:int, count:int=1):
+        first = count
+        for slot in self.slots:
+            if slot.id == 0:
+                slot.reID(id)
+                slot.count = count
+                return True
+        if first != count:
+            return count
+        return False
 
     def add(self, id:int, count:int=1):
-        first = count
         for slot in self.slots:
             if slot.use == 'block':
                 if slot.id == id and slot.count < 64:
@@ -116,13 +125,6 @@ class HotBar:
                         slot.count.normalize()
                         continue
                     return True
-        for slot in self.slots:
-            if slot.id == 0:
-                slot.reID(id)
-                slot.count = count
-                return True
-        if first != count:
-            return count
         return False
 
 class Inventory:
@@ -143,6 +145,9 @@ class Inventory:
         self.move_slot = Slot(0)
         self.move_slot.last = None
 
+        self.set(6, 0, 64)
+        self.set(7, 1, 64)
+
     def set(self, id:int, slot:int, count:int=1):
         self.slots['inventory'][slot].reID(id)
         self.slots['inventory'][slot].count = count
@@ -150,12 +155,14 @@ class Inventory:
     def add(self, id:int, count:int=1):
         hb = self.hotbar.add(id, count)
         if hb: return True
-        elif hb._class__ == int: count = hb
         for slot in self.slots['inventory']:
             if slot.use == 'block':
                 if slot.id == id and slot.count < 64:
                     slot.count += count
                     return True
+        hb = self.hotbar.add_air(id, count)
+        if hb: return True
+        elif hb.__class__ == int: count = hb
         for slot in self.slots['inventory']:
             if slot.id == 0:
                 slot.reID(id)
@@ -167,7 +174,7 @@ class Inventory:
         self.active = True
 
     def close(self):
-        self.move_slot = None
+        self.move_slot.last = None
         self.active = False
 
     def OO(self):

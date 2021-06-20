@@ -5,3 +5,4 @@ Stone  stone.png  block
 Cobblestone  cobblestone.png  block
 Bedrock  bedrock.png  block
 Cobblestone HB  cobblestone.png  block  HB
+SlimeBlock  slimeblock.png  block

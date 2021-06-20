@@ -22,9 +22,9 @@ class Main:
         self.inventory.pos = (WWIDTH//2-self.inventory.rect.w//2, WHEIGHT//2-self.inventory.rect.h//2)
         self.player.inventory = self.inventory
         self.blocks_id = {1: objects.Dirt, 2: objects.Grass, 3: objects.Stone, 4: objects.CobbleStone,
-                          5: objects.Bedrock, 6:objects.CobbleStoneHB}
+                          5: objects.Bedrock, 6:objects.CobbleStoneHB, 7:objects.SlimeBlock}
         self.items_id = {1: objects.ItemDirt, 2: objects.ItemGrass, 3: objects.ItemStone, 4: objects.ItemCobbleStone,
-                         5: objects.ItemBedrock, 6:objects.ItemCobbleStoneHB}
+                         5: objects.ItemBedrock, 6:objects.ItemCobbleStoneHB, 7:objects.ItemSlimeBlock}
 
     def play(self):
         self.set_chank()
@@ -35,6 +35,7 @@ class Main:
         self.items.update(self.chank)
         self.item_collision()
         self.mobs.update(self.clchank, self.clchank2, self.chanks)
+        self.player.speed = PSPE
         # for i in self.mobs:
         #     print(i.x, i.y, i.rect.x, i.rect.y)
         #     self.player.x = -i.x
@@ -118,8 +119,8 @@ class Main:
                                 item = self.items_id[block_id](*block_pos, self.player)
                                 self.items.add(item)
                     else:
-                        if event.button == 1:
-                            self.inventory.move()
+                        if event.button == 1: self.inventory.move()
+                        elif event.button == 3: self.inventory.move(True)
                 elif event.type == pg.KEYDOWN:
                     if event.key == pg.K_e:
                         self.inventory.OO()
