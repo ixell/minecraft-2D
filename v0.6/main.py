@@ -71,10 +71,11 @@ class Main:
 
     def set_chank(self):
         global SPAWNCHANK
-        index = abs(55-(((self.player.x-WWIDTH//2)//BSIZE-CSIZE//2)//CSIZE+SPAWNCHANK))
+        index = 56 - abs(self.player.x//BSIZE//CSIZE+SPAWNCHANK)
+        print(index, '          ', 56 - abs(self.player.x)//BSIZE)
         self.clchank = self.chanks[index]
         self.chank = self.clchank.get_group()
-        if ((self.player.x-WWIDTH//2)//BSIZE-CSIZE//2) % CSIZE < CSIZE//2:
+        if ((self.player.x-WWIDTH//2-self.player.rect.w//2)//BSIZE-CSIZE//2) % CSIZE < CSIZE//2:
             self.clchank2 = self.chanks[index+1]
         else: self.clchank2 = self.chanks[index-1]
         self.chank2 = self.clchank2.get_group()
@@ -98,7 +99,6 @@ class Main:
             self.hotbar.draw()
         self.inventory.draw()
         pg.display.update()
-        # pg.time.delay(3000)
 
     def run(self):
         run = True

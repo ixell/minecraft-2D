@@ -122,6 +122,10 @@
             id = 4
             блок булыжника
         
+        SlimeBlock(Block):
+            id = 6
+            блок слизи
+        
         Chank:
             attributes:
                 map - объект Group из pygame.sprite, позиция блоков чанков
@@ -146,7 +150,31 @@
                 __init__(self, x, y, player, image, name, take) - инициализация атрибутов
                 update(self) - двигает предмет
                 collision(self) - вызывается тогда, когда игрок каснётся предмета
+
+        ItemGrass(Item):
+            id = 2
+            Предмет травы
         
+        ItemDirt(Item):
+            id = 1
+            Предмет земли
+        
+        ItemStone(Item):
+            id = 3
+            Предмет камня
+        
+        ItemBedrock(Item):
+            id = 5
+            Предмет бедрока (неломаемый)
+        
+        ItemCobblestone(Item):
+            id = 4
+            Предмет булыжника
+        
+        ItemSlimeBlock(Item):
+            id = 6
+            Предмет блока слизи
+
         Mob:
             attributes:
                 image - изображение моба
@@ -172,7 +200,7 @@
             methods:
                 __init__(self, image, pos) - инициализация атрибутов
                 move_to(self, pos) - место, куда переместится изображение
-        
+
         Slot:
             attributes:
                 id - id предмета в слоте
@@ -185,7 +213,7 @@
                 __init__(self, item_id, count=0) - инициализация атрибутов
                 normalize(self) - поправляет количество (0 - 64)
                 reID(self, new_id) - меняет предмет в слоте
-        
+
         HotBar:
             attributes:
                 pos - местоположение хотбара
@@ -209,6 +237,27 @@
                 normalize(self) - поправляет количество всех слотов (0 - 64)
                 get_hotslot(self) - возвращает активный слот
                 add(self, id, count) - добавляет предмет
+
+        INventory:
+            attributes:
+                pos - позиция инвентаря
+                hotbar - объект HotBar
+                screen - экран
+                original_image - изображение
+                rect - копия original_image
+                active - включён / выключен
+                slots - все слоты
+                width - размер квадратов
+                font - шрифт
+                move_slot - слот для перемещения предметов
+            methods:
+                set(self, id, slot, count) - ставит предмет в определённый слот в инвентаре
+                add(self, id, count) - ставит прдмет в свободное мест в инвенторе / хотбаре
+                open(self) - открывает инвентарь
+                close(self) - закрывает инвентарь
+                OO(self) - закрывает / открывает инвентарь
+                draw(self) - рисует инвентарь
+                move(self, rc=False) - двигает предметы в инвенторе
 
 Пакет Files:
     Папка Textures:

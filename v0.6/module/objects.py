@@ -19,7 +19,7 @@ class Mouse:
 
     def select(self):
         mpos = list(pg.mouse.get_pos())
-        chank = abs(55-((self.player.x//BSIZE-CSIZE//2)//CSIZE+SPAWNCHANK))
+        chank = 56 - abs((self.player.x+mpos[0])//BSIZE//CSIZE+SPAWNCHANK)
         mpos[0] = ((mpos[0]-self.player.x%BSIZE)//BSIZE-self.player.x//BSIZE)*BSIZE
         mpos[1] = ((mpos[1]-self.player.y%BSIZE)//BSIZE-self.player.y//BSIZE)*BSIZE
         return self.chanks[chank].get_group(), mpos
@@ -47,7 +47,6 @@ class Mouse:
             if obj.x == pos[0] and obj.y == pos[1]:
                 if obj.destructible:
                     chank.remove(obj)
-                    print(obj.id)
                     return pos, obj.id, True
                 return (-1, -1), 0, False
         return (-1, -1), 0, False
@@ -316,8 +315,7 @@ class SlimeBlock(Block):
         super().__init__(x, y, player, image, 7)
     
     def collision(self, mob, coord):
-        if 'y' in coord: mob.change_y *= -0.5
-        mob.speed = 4
+        if 'y' in coord: mob.change_y = (mob.change_y - 1) * -0.5
         return True
 
 

@@ -17,7 +17,7 @@ class Slot:
         self.hb_mode = False
         if self.use == 'block' and len(self.other) > 0 and 'HB' in self.other:
             self.image = self.image.subsurface(0, 0, self.rect.w, self.rect.h//2)
-            hb_mode = True
+            self.hb_mode = True
         self.rect = self.image.get_rect()
         self.count = count
 
