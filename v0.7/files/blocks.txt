@@ -1,0 +1,7 @@
+Dirt = dirt.png
+Grass = grass.png
+Stone = stone.png
+CobbleStone = cobblestone.png
+Bedrock = bedrock.png
+SlimeBlock = slimeblock.png
+Fire = fire_0_placeholder.png
