@@ -3,9 +3,8 @@ import random
 random.seed(528349)
 screen2 = pg.display.set_mode((400, 500))
 screen = pg.Surface((400, 500))
-generate = lambda y: (  generator(y)%256   ,)*3
-generator = lambda y: 25-y
-procent = 100
+generate = lambda y: (   (25-y)%256   ,)*3
+procent = 12
 run = True
 add_x = 0
 add_y = 0
@@ -18,7 +17,7 @@ while run:
     screen.blit(move, (0, 0))
     add_x += 1
     for y in range(25):
-        pg.draw.rect(screen, generate(y+add_y+3), (380, y*20, 20, 20))
+        pg.draw.rect(screen, generate(y+add_y+2), (380, y*20, 20, 20))
     procent += random.randint(-1, 5)
     if procent > 100: procent = 100
     if random.randint(1, 100) - procent <= 0:

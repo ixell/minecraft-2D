@@ -1,5 +1,6 @@
 from module import *
 import pygame as pg
+import random
 
 
 class Main:
@@ -24,7 +25,7 @@ class Main:
                           5: objects.Bedrock, 6:objects.CobbleStoneHB, 7:objects.SlimeBlock, 8:objects.Fire}
         self.items_id = {1: objects.ItemDirt, 2: objects.ItemGrass, 3: objects.ItemStone, 4: objects.ItemCobbleStone,
                          5: objects.ItemBedrock, 6:objects.ItemCobbleStoneHB, 7:objects.ItemSlimeBlock}
-        self.generate()
+        self.generate(1)
 
     def play(self):
         self.player.speed = PSPE
@@ -41,7 +42,7 @@ class Main:
         #     self.player.x = -i.x
         #     break
 
-    def generate(self):
+    def generate2(self):
         block_list = []
         for x in range(CSIZE):
             block_list.append([5, x-CSIZE//2, 0])
@@ -62,19 +63,41 @@ class Main:
             block = self.blocks_id[coord[0]](*coord[1:], self.player)
             lst.append(block)
         chank = objects.Chank(lst)
-        chank.change_pos(move_x=-25)
         self.chanks.append(chank)
-        for i in range(1, 60):
-            ch = chank.copy()
-            ch.change_pos(move_x=i)
-            self.chanks.append(ch)
         self.set_chank()
 
-    def real_generate(self, seed):
-        block_list = []
-        for x in range(CSIZE):
-            for y in range(25):
-                pass
+    def generate(self, seed):
+        random.seed(seed)
+        procent = 12
+        add_y = 0
+        for i in range(1, 60):
+            block_list = []
+            for x in range(CSIZE):
+                block_list.append([2, x-CSIZE//2, DEFAULT_Y+add_y])
+                for y in range(3):
+                    block_list.append([1, x-CSIZE//2, DEFAULT_Y+add_y+y-3])
+                for y in range(DEFAULT_Y+add_y-4):
+                    block_list.append([3, x-CSIZE//2, DEFAULT_Y+add_y-y-4])
+                block_list.append([5, x-CSIZE//2, 0])
+                procent += random.randint(-1, 5)
+                if procent > 100: procent = 100
+                if random.randint(1, 100) - procent <= 0:
+                    print(add_y)
+                    if add_y >= 6: add = -1
+                    elif add_y <= 0: add = 1
+                    else: add = random.choice((1, -1))
+                    add_y += add
+                    procent = 0
+            lst = []
+            for coord in block_list:
+                coord[1] = coord[1] * BSIZE
+                coord[2] = (coord[2]-6) * -BSIZE
+                block = self.blocks_id[coord[0]](*coord[1:], self.player)
+                lst.append(block)
+            chank = objects.Chank(lst)
+            chank.change_pos(move_x=-26+i)
+            self.chanks.append(chank)
+        self.set_chank()
 
     def set_chank(self):
         global SPAWNCHANK
