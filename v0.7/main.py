@@ -22,10 +22,10 @@ class Main:
         self.inventory.pos = (WWIDTH//2-self.inventory.rect.w//2, WHEIGHT//2-self.inventory.rect.h//2)
         self.player.inventory = self.inventory
         self.blocks_id = {1: objects.Dirt, 2: objects.Grass, 3: objects.Stone, 4: objects.CobbleStone,
-                          5: objects.Bedrock, 6:objects.CobbleStoneHB, 7:objects.SlimeBlock, 8:objects.Fire}
+                          5: objects.Bedrock, 6:objects.CobbleStoneHB, 7:objects.SlimeBlock, 8:objects.Fire, 9:objects.Wood}
         self.items_id = {1: objects.ItemDirt, 2: objects.ItemGrass, 3: objects.ItemStone, 4: objects.ItemCobbleStone,
-                         5: objects.ItemBedrock, 6:objects.ItemCobbleStoneHB, 7:objects.ItemSlimeBlock}
-        self.generate(1)
+                         5: objects.ItemBedrock, 6:objects.ItemCobbleStoneHB, 7:objects.ItemSlimeBlock, 9:objects.ItemWood}
+        self.generate(int(input('seed for generator >> ')))
 
     def play(self):
         self.player.speed = PSPE
@@ -42,33 +42,10 @@ class Main:
         #     self.player.x = -i.x
         #     break
 
-    def generate2(self):
-        block_list = []
-        for x in range(CSIZE):
-            block_list.append([5, x-CSIZE//2, 0])
-        for x in range(CSIZE):
-            for y in range(20):
-                block_list.append([3, x-CSIZE//2, y+1])
-        for x in range(CSIZE):
-            for y in range(4):
-                block_list.append([1, x-CSIZE//2, y+21])
-        for x in range(CSIZE):
-            block_list.append([2, x-CSIZE//2, 25])
-        # for x in range(CSIZE):
-        #     block_list.append([8, x-CSIZE//2, 26])
-        lst = []
-        for coord in block_list:
-            coord[1] = coord[1] * BSIZE
-            coord[2] = (coord[2]-6) * -BSIZE
-            block = self.blocks_id[coord[0]](*coord[1:], self.player)
-            lst.append(block)
-        chank = objects.Chank(lst)
-        self.chanks.append(chank)
-        self.set_chank()
-
     def generate(self, seed):
         random.seed(seed)
-        procent = 12
+        procent = random.randint(0, 100)
+        wood_procent = random.randint(0, 100)
         add_y = 0
         for i in range(1, 60):
             block_list = []
@@ -79,13 +56,19 @@ class Main:
                 for y in range(DEFAULT_Y+add_y-4):
                     block_list.append([3, x-CSIZE//2, DEFAULT_Y+add_y-y-4])
                 block_list.append([5, x-CSIZE//2, 0])
-                procent += random.randint(-1, 5)
+                procent += random.randint(-2, 7)
+                wood_procent += random.randint(2, 10)
                 if procent > 100: procent = 100
+                if wood_procent > 100: wood_procent = 100
+                if wood_procent - random.randint(1, 100) >= 0:
+                    for y in range(DEFAULT_WOOD_SIZE + random.randint(0, 2)):
+                        block_list.append([9, x - CSIZE//2, DEFAULT_Y+add_y+1+y])
+                    wood_procent = -12
                 if random.randint(1, 100) - procent <= 0:
-                    print(add_y)
                     if add_y >= 6: add = -1
                     elif add_y <= 0: add = 1
                     else: add = random.choice((1, -1))
+                    if 7 - random.randint(1, 100) > 0: add *= 2
                     add_y += add
                     procent = 0
             lst = []

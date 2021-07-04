@@ -164,12 +164,14 @@ class Player(pg.sprite.Sprite):
 
     def jump(self, chank):
         self.rect.y += 2
-        pd = bool(pg.sprite.spritecollide(self, chank, False))
+        pd = []
+        pdb = bool(pg.sprite.spritecollide(self, chank, False))
         self.rect.y -= 4
-        if pd:
-            pd = not bool(pg.sprite.spritecollide(self, chank, False))
+        if pdb:
+            pd = pg.sprite.spritecollide(self, chank, False)
+            pdb = not bool(pd)
         self.rect.y += 2
-        if pd or self.y <= self.lleg.rect.height:
+        if pdb or self.y <= self.lleg.rect.height or bool(pd) and pd[0].through:
             self.change_y = 5 * ((self.rect.height) // BSIZE)
     
     def back(self, rotate):
@@ -193,7 +195,7 @@ class Player(pg.sprite.Sprite):
             self.sprites_rotate()
         else:
             self.rots = {'lhand':[0, 1], 'rhand':[0, -1], 'lleg':[0, 1], 'rleg':[0, -1]}
-            self.sprites_rotate()
+            self.sprites_rotate()       
         if keys[pg.K_UP] or keys[pg.K_w] or keys[pg.K_SPACE]:
             self.jump(chank)
         if keys[pg.K_DOWN] or keys[pg.K_s]:
@@ -204,36 +206,43 @@ class Player(pg.sprite.Sprite):
         self.rect.x += self.change_x
         bhl = pg.sprite.spritecollide(self, chank, False)
         cb = False
-        if bool(bhl):
-            self.rect.x = x
-            if not bool(pg.sprite.spritecollide(self, chank, False)):
-                obj = bhl[0]
-                if self.change_x > 0:
-                    cb = obj.collision(self, 'x+')
-                    self.rect.right = obj.rect.left
-                else:
-                    cb = obj.collision(self, 'x-')
-                    self.rect.left = obj.rect.right
+        ci = 0
+        for i in bhl:
+            if i.through: ci += 1
+            if ci == len(bhl): break
+        else:
+            if bool(bhl):
+                self.rect.x = x
+                if not bool(pg.sprite.spritecollide(self, chank, False)):
+                    obj = bhl[0]
+                    if not obj.through:
+                        if self.change_x > 0:
+                            cb = obj.collision(self, 'x+')
+                            self.rect.right = obj.rect.left
+                        else:
+                            cb = obj.collision(self, 'x-')
+                            self.rect.left = obj.rect.right
         cb = False
         self.rect.y -= self.change_y
         bhl = pg.sprite.spritecollide(self, chank, False)
-        if bool(bhl):
-            self.rect.y = y
-            if not bool(pg.sprite.spritecollide(self, chank, False)):
-                obj = bhl[0]
-                if self.change_y > 0:
-                    cb = obj.collision(self, 'y-')
-                    self.rect.top = obj.rect.bottom
-                    if not cb: self.change_y *= -0.25
-                else:
-                    cb = obj.collision(self, 'y+')
-                    self.rect.bottom = obj.rect.top
-                    if not cb: self.change_y = 0
-            if not cb:
-                for obj in bhl:
+        ci = 0
+        for i in bhl:
+            if i.through: ci += 1
+            if ci == len(bhl): break
+        else:
+            if bool(bhl):
+                self.rect.y = y
+                if not bool(pg.sprite.spritecollide(self, chank, False)):
+                    obj = bhl[0]
                     if not obj.through:
-                        self.change_y = 0
-                        break
+                        if self.change_y > 0:
+                            cb = obj.collision(self, 'y-')
+                            self.rect.top = obj.rect.bottom
+                            if not cb: self.change_y *= -0.25
+                        else:
+                            cb = obj.collision(self, 'y+')
+                            self.rect.bottom = obj.rect.top
+                            if not cb: self.change_y = 0
         cx = self.rect.x - x
         cy = self.rect.y - y
         self.cmove(cx, cy)
@@ -327,6 +336,11 @@ class Fire(Block):
     def __init__(self, x, y, player):
         image = files.blocks['Fire']
         super().__init__(x, y, player, image, 8, through=True, destructible=False)
+
+class Wood(Block):
+    def __init__(self, x, y, player):
+        image = files.blocks['Wood']
+        super().__init__(x, y, player, image, 9, through=True)
 
 
 class Chank:
@@ -442,6 +456,13 @@ class ItemCobbleStoneHB(Item):
 class ItemSlimeBlock(Item):
     def __init__(self, x, y, player, name='slime block', take=True):
         id = 7
+        image = 'files/textures/' + items[id].split('  ')[1]
+        image = pg.image.load(image).convert_alpha()
+        super().__init__(x, y, player, image, name, take, id=id)
+
+class ItemWood(Item):
+    def __init__(self, x, y, player, name='oak_log', take=True):
+        id = 9
         image = 'files/textures/' + items[id].split('  ')[1]
         image = pg.image.load(image).convert_alpha()
         super().__init__(x, y, player, image, name, take, id=id)

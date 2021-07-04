@@ -147,6 +147,7 @@ class Inventory:
 
         self.set(6, 0, 64)
         self.set(7, 1, 64)
+        self.hotbar.set(9, 1)
 
     def set(self, id:int, slot:int, count:int=1):
         self.slots['inventory'][slot].reID(id)

@@ -19,7 +19,7 @@ def init():
         block = texture(i[1]).strip('\n')
         block = pg.transform.scale(pg.image.load(block).convert_alpha(), (BSIZE, BSIZE))
         blocks[i[0]] = block
-    
+
     player = {}
     lines = fplayer.readlines()
     for i in lines:
