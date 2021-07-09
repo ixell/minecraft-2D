@@ -8,3 +8,4 @@ Cobblestone HB  cobblestone.png  block  HB
 SlimeBlock  slimeblock.png  block
 None
 Wood  log_oak.png  block
+Leaves  leaves_oak.png  block

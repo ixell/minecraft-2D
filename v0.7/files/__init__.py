@@ -8,8 +8,8 @@ def pull_out(message):
 
 def init():
     global blocks, player
-    fblocks = open('files/blocks.txt')
-    fplayer = open('files/player.txt')
+    fblocks = open('files/objects/blocks.txt')
+    fplayer = open('files/objects/player.txt')
     texture = lambda x: 'files/textures/' + x
 
     blocks = {}

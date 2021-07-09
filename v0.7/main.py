@@ -22,10 +22,14 @@ class Main:
         self.inventory.pos = (WWIDTH//2-self.inventory.rect.w//2, WHEIGHT//2-self.inventory.rect.h//2)
         self.player.inventory = self.inventory
         self.blocks_id = {1: objects.Dirt, 2: objects.Grass, 3: objects.Stone, 4: objects.CobbleStone,
-                          5: objects.Bedrock, 6:objects.CobbleStoneHB, 7:objects.SlimeBlock, 8:objects.Fire, 9:objects.Wood}
+                          5: objects.Bedrock, 6:objects.CobbleStoneHB, 7:objects.SlimeBlock, 8:objects.Fire, 9:objects.Wood, 
+                          10:objects.Leaves}
         self.items_id = {1: objects.ItemDirt, 2: objects.ItemGrass, 3: objects.ItemStone, 4: objects.ItemCobbleStone,
-                         5: objects.ItemBedrock, 6:objects.ItemCobbleStoneHB, 7:objects.ItemSlimeBlock, 9:objects.ItemWood}
-        self.generate(int(input('seed for generator >> ')))
+                         5: objects.ItemBedrock, 6:objects.ItemCobbleStoneHB, 7:objects.ItemSlimeBlock, 9:objects.ItemWood,
+                         10:objects.ItemLeaves}
+        seed = random.randint(0, 999999999999)
+        print('seed: ' + str(seed))
+        self.generate(seed)
 
     def play(self):
         self.player.speed = PSPE
@@ -49,21 +53,38 @@ class Main:
         add_y = 0
         for i in range(1, 60):
             block_list = []
+            block_pos_list = []
             for x in range(CSIZE):
-                block_list.append([2, x-CSIZE//2, DEFAULT_Y+add_y])
+                block_pos_list.append([x-CSIZE//2, DEFAULT_Y+add_y])
+                block_list.append(2)
                 for y in range(3):
-                    block_list.append([1, x-CSIZE//2, DEFAULT_Y+add_y+y-3])
+                    block_pos_list.append([x-CSIZE//2, DEFAULT_Y+add_y+y-3])
+                    block_list.append(1)
                 for y in range(DEFAULT_Y+add_y-4):
-                    block_list.append([3, x-CSIZE//2, DEFAULT_Y+add_y-y-4])
-                block_list.append([5, x-CSIZE//2, 0])
+                    block_pos_list.append([x-CSIZE//2, DEFAULT_Y+add_y-y-4])
+                    block_list.append(3)
+                block_pos_list.append([x-CSIZE//2, 0])
+                block_list.append(5)
                 procent += random.randint(-2, 7)
                 wood_procent += random.randint(2, 10)
                 if procent > 100: procent = 100
                 if wood_procent > 100: wood_procent = 100
                 if wood_procent - random.randint(1, 100) >= 0:
-                    for y in range(DEFAULT_WOOD_SIZE + random.randint(0, 2)):
-                        block_list.append([9, x - CSIZE//2, DEFAULT_Y+add_y+1+y])
-                    wood_procent = -12
+                    if not 3 <= x <= 15:
+                        wood_procent //= 4
+                    else:
+                        wood_size = DEFAULT_WOOD_SIZE + random.randint(0, 2)
+                        for y in range(wood_size):
+                            block_pos_list.append([x - CSIZE//2, DEFAULT_Y+add_y+1+y])
+                            block_list.append(9)
+                        for y in range(5):
+                            for x2 in range(5):
+                                if y >= 3 and (x2 == 0 or x2 == 4): continue
+                                pos = [x2+x-CSIZE//2-2, DEFAULT_Y+add_y+wood_size+(y-1)]
+                                if not pos in block_pos_list:
+                                    block_pos_list.append(pos)
+                                    block_list.append(10)
+                        wood_procent = -30
                 if random.randint(1, 100) - procent <= 0:
                     if add_y >= 6: add = -1
                     elif add_y <= 0: add = 1
@@ -72,10 +93,10 @@ class Main:
                     add_y += add
                     procent = 0
             lst = []
-            for coord in block_list:
-                coord[1] = coord[1] * BSIZE
-                coord[2] = (coord[2]-6) * -BSIZE
-                block = self.blocks_id[coord[0]](*coord[1:], self.player)
+            for indx, coord in enumerate(block_pos_list):
+                coord[0] = coord[0] * BSIZE
+                coord[1] = (coord[1]-6) * -BSIZE
+                block = self.blocks_id[block_list[indx]](*coord, self.player)
                 lst.append(block)
             chank = objects.Chank(lst)
             chank.change_pos(move_x=-26+i)

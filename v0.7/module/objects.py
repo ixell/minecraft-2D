@@ -70,10 +70,10 @@ class Image(pg.sprite.Sprite):
 
     def update(self, pos):
         self.move_to(pos)
-    
+
     def copy(self):
         return self.__class__(self.image, (self.rect.x, self.rect.y))
-    
+
     def rerect(self, x):
         self.rect = self.image.get_rect(x=x, y=self.rect.y)
 
@@ -117,7 +117,7 @@ class Player(pg.sprite.Sprite):
         if orig:
             for i in (self.lhand, self.rhand, self.head, self.body, self.lleg, self.rleg):
                 i.orig_rect = i.rect.copy()
-    
+
     def sprites_rotate(self):
         self.lhand.image = pg.transform.rotate(self.lhand.original_image, self.rots['lhand'][0])
         self.rhand.image = pg.transform.rotate(self.rhand.original_image, self.rots['rhand'][0])
@@ -173,7 +173,7 @@ class Player(pg.sprite.Sprite):
         self.rect.y += 2
         if pdb or self.y <= self.lleg.rect.height or bool(pd) and pd[0].through:
             self.change_y = 5 * ((self.rect.height) // BSIZE)
-    
+
     def back(self, rotate):
         self.lleg.image = pg.transform.flip(self.lleg.original_image, rotate, False)
         self.rleg.image = pg.transform.flip(self.rleg.original_image, rotate, False)
@@ -342,6 +342,11 @@ class Wood(Block):
         image = files.blocks['Wood']
         super().__init__(x, y, player, image, 9, through=True)
 
+class Leaves(Block):
+    def __init__(self, x, y, player):
+        image = files.blocks['Leaves']
+        super().__init__(x, y, player, image, 10)
+
 
 class Chank:
     def __init__(self, generation):
@@ -461,8 +466,15 @@ class ItemSlimeBlock(Item):
         super().__init__(x, y, player, image, name, take, id=id)
 
 class ItemWood(Item):
-    def __init__(self, x, y, player, name='oak_log', take=True):
+    def __init__(self, x, y, player, name='oak log', take=True):
         id = 9
+        image = 'files/textures/' + items[id].split('  ')[1]
+        image = pg.image.load(image).convert_alpha()
+        super().__init__(x, y, player, image, name, take, id=id)
+
+class ItemLeaves(Item):
+    def __init__(self, x, y, player, name='oak leaves', take=True):
+        id = 10
         image = 'files/textures/' + items[id].split('  ')[1]
         image = pg.image.load(image).convert_alpha()
         super().__init__(x, y, player, image, name, take, id=id)

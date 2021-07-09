@@ -6,3 +6,4 @@ Bedrock = bedrock.png
 SlimeBlock = slimeblock.png
 Fire = fire_0_placeholder.png
 Wood = log_oak.png
+Leaves = leaves_oak.png
