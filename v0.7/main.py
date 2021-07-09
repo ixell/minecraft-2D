@@ -121,7 +121,7 @@ class Main:
                     self.items.remove(item)
 
     def draw(self):
-        self.screen.fill(WHITE)
+        self.screen.fill((135, 206, 235))
         self.items.draw(self.screen)
         self.chank.draw(self.screen)
         self.chank2.draw(self.screen)

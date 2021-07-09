@@ -164,14 +164,22 @@ class Player(pg.sprite.Sprite):
 
     def jump(self, chank):
         self.rect.y += 2
+        cpd = pg.sprite.spritecollide(self, chank, False)
         pd = []
-        pdb = bool(pg.sprite.spritecollide(self, chank, False))
         self.rect.y -= 4
-        if pdb:
-            pd = pg.sprite.spritecollide(self, chank, False)
+        for block in cpd:
+            if not block.through:
+                pd.append(block)
+        pdb = bool(pd)
+        if pd:
+            cpd = pg.sprite.spritecollide(self, chank, False)
+            pd = []
+            for block in cpd:
+                if not block.through:
+                    pd.append(block)
             pdb = not bool(pd)
         self.rect.y += 2
-        if pdb or self.y <= self.lleg.rect.height or bool(pd) and pd[0].through:
+        if pdb or self.y <= self.lleg.rect.height:
             self.change_y = 5 * ((self.rect.height) // BSIZE)
 
     def back(self, rotate):
@@ -204,45 +212,49 @@ class Player(pg.sprite.Sprite):
     def collision(self, chank):
         x, y = (self.rect.x, self.rect.y)
         self.rect.x += self.change_x
-        bhl = pg.sprite.spritecollide(self, chank, False)
+        cbhl = pg.sprite.spritecollide(self, chank, False)
+        bhl = []
         cb = False
-        ci = 0
-        for i in bhl:
-            if i.through: ci += 1
-            if ci == len(bhl): break
-        else:
-            if bool(bhl):
-                self.rect.x = x
-                if not bool(pg.sprite.spritecollide(self, chank, False)):
-                    obj = bhl[0]
-                    if not obj.through:
-                        if self.change_x > 0:
-                            cb = obj.collision(self, 'x+')
-                            self.rect.right = obj.rect.left
-                        else:
-                            cb = obj.collision(self, 'x-')
-                            self.rect.left = obj.rect.right
+        for block in cbhl:
+            if not block.through:
+                bhl.append(block)
+        if bool(bhl):
+            self.rect.x = x
+            nbhl = pg.sprite.spritecollide(self, chank, False)
+            for i, block in enumerate(nbhl):
+                if block.through: del nbhl[i]
+            if not bool(nbhl):
+                obj = bhl[0]
+                if self.change_x > 0:
+                    cb = obj.collision(self, 'x+')
+                    self.rect.right = obj.rect.left
+                else:
+                    cb = obj.collision(self, 'x-')
+                    self.rect.left = obj.rect.right
         cb = False
         self.rect.y -= self.change_y
-        bhl = pg.sprite.spritecollide(self, chank, False)
-        ci = 0
-        for i in bhl:
-            if i.through: ci += 1
-            if ci == len(bhl): break
-        else:
-            if bool(bhl):
-                self.rect.y = y
-                if not bool(pg.sprite.spritecollide(self, chank, False)):
-                    obj = bhl[0]
-                    if not obj.through:
-                        if self.change_y > 0:
-                            cb = obj.collision(self, 'y-')
-                            self.rect.top = obj.rect.bottom
-                            if not cb: self.change_y *= -0.25
-                        else:
-                            cb = obj.collision(self, 'y+')
-                            self.rect.bottom = obj.rect.top
-                            if not cb: self.change_y = 0
+        cbhl = pg.sprite.spritecollide(self, chank, False)
+        bhl = []
+        for block in cbhl:
+            if not block.through:
+                bhl.append(block)
+        if bool(bhl):
+            self.rect.y = y
+            cnbhl = pg.sprite.spritecollide(self, chank, False)
+            nbhl = []
+            for block in cnbhl:
+                if not block.through:
+                    nbhl.append(block)
+            if not bool(nbhl):
+                obj = bhl[0]
+                if self.change_y > 0:
+                    cb = obj.collision(self, 'y-')
+                    self.rect.top = obj.rect.bottom
+                    if not cb: self.change_y *= -0.25
+                else:
+                    cb = obj.collision(self, 'y+')
+                    self.rect.bottom = obj.rect.top
+                    if not cb: self.change_y = 0
         cx = self.rect.x - x
         cy = self.rect.y - y
         self.cmove(cx, cy)
@@ -409,7 +421,7 @@ class Item(pg.sprite.Sprite):
 class TestItem(Item):
     def __init__(self, x, y, player, name='test item', take=True):
         image = pg.Surface((ISIZE, ISIZE))
-        image.fill(YELLOW)
+        image.fill((200, 150, 0))
         super().__init__(x, y, player, image, name, take)
 
     def collision(self):
