@@ -145,9 +145,15 @@ class Inventory:
         self.move_slot = Slot(0)
         self.move_slot.last = None
 
-        self.set(6, 0, 64)
-        self.set(7, 1, 64)
-        self.hotbar.set(9, 1)
+        self.set(1, 1, 64)
+        self.set(2, 2, 64)
+        self.set(3, 3, 64)
+        self.set(4, 4, 64)
+        self.set(5, 5, 64)
+        self.set(6, 6, 64)
+        self.set(7, 7, 64)
+        self.set(9, 8, 64)
+        self.set(10, 9, 64)
 
     def set(self, id:int, slot:int, count:int=1):
         self.slots['inventory'][slot].reID(id)

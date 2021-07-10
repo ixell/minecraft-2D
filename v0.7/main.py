@@ -10,7 +10,7 @@ class Main:
         pg.display.set_caption(WNAME)
         files.init()
         self.clock = pg.time.Clock()
-        self.player = objects.Player(0, 1206)
+        self.player = objects.Player(0, DEFAULT_Y*BSIZE+7*BSIZE+6)
         self.chanks = []
         self.mouse = objects.Mouse(
             (255, 0, 0), (0, 0, 255), self.screen, self.player, self.chanks)
@@ -37,8 +37,8 @@ class Main:
         self.hotbar.normalize()
         self.chank.update()
         self.chank2.update()
-        self.player.update(self.chank)
-        self.items.update(self.chank)
+        self.player.update(self.chank, self.chank2)
+        self.items.update(self.clchank, self.clchank2, self.chanks)
         self.item_collision()
         self.mobs.update(self.clchank, self.clchank2, self.chanks)
         # for i in self.mobs:

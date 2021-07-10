@@ -19,7 +19,8 @@ class Mouse:
 
     def select(self):
         mpos = list(pg.mouse.get_pos())
-        chank = 56 - abs(((self.player.x)//BSIZE)//CSIZE+SPAWNCHANK)
+        chank = 56 - abs(((self.player.x-mpos[0]+self.player.rect.x)//BSIZE)//CSIZE+SPAWNCHANK)
+        print(chank)
         mpos[0] = ((mpos[0]-self.player.x%BSIZE)//BSIZE-self.player.x//BSIZE)*BSIZE
         mpos[1] = ((mpos[1]-self.player.y%BSIZE)//BSIZE-self.player.y//BSIZE)*BSIZE
         return self.chanks[chank].get_group(), mpos
@@ -154,9 +155,11 @@ class Player(pg.sprite.Sprite):
                          self.rhand, self.lhand)
         # self.sprites.add(self.head)
 
-    def update(self, chank):
+    def update(self, chank, chank2):
         self.move(chank)
-        self.collision(chank)
+        cmpos = self.collision(chank2, (False, False))
+        cmpos = cmpos[0] != 0, cmpos[1] != 0
+        self.collision(chank, cmpos)
         self.change_x = 0
 
     def draw(self, screen):
@@ -209,7 +212,7 @@ class Player(pg.sprite.Sprite):
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             pass
 
-    def collision(self, chank):
+    def collision(self, chank, can_move=(True, True)):
         x, y = (self.rect.x, self.rect.y)
         self.rect.x += self.change_x
         cbhl = pg.sprite.spritecollide(self, chank, False)
@@ -257,9 +260,18 @@ class Player(pg.sprite.Sprite):
                     if not cb: self.change_y = 0
         cx = self.rect.x - x
         cy = self.rect.y - y
-        self.cmove(cx, cy)
         self.rect.x = x
         self.rect.y = y
+        if all(can_move):
+            self.cmove(cx, cy)
+            return cx, cy
+        elif can_move[0]:
+            self.cmove(cx, 0)
+            return cx, cy
+        elif can_move[1]:
+            self.cmove(0, cy)
+            return cx, cy
+        else: return cx, cy
 
     def cmove(self, x, y):
         self.x -= x
@@ -396,9 +408,19 @@ class Item(pg.sprite.Sprite):
         self.take = take
         if id!=None: self.id = id
 
-    def update(self, chank):
+    def update(self, chank1, chank2, chanks):
         self.rect.x = self.player.x + self.x
         self.rect.y = self.player.y + self.y
+        index = abs(55-(((-self.x)//BSIZE-CSIZE//2)//CSIZE+SPAWNCHANK))
+        if chanks[index] == chank1 or chanks[index] == chank2:
+            chank = chanks[index].get_group()
+        else:
+            return
+        self.move(chank)
+
+    def move(self, chank):
+        # self.rect.x = self.player.x + self.x
+        # self.rect.y = self.player.y + self.y
         self.grav(chank)
         self.y += self.change_y
     
