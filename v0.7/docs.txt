@@ -43,7 +43,7 @@
             methods:
                 __init__(self) - инициализация атрибутов
                 play(self) - выполняет игровые функции
-                generate(self) - генерирует мир
+                generate(self, seed) - генерирует мир
                 set_chank(self) - создаёт или пересоздаёт атрибуты chank и clchank
                 draw(self) - рисует нужные объекты
                 run(self) - главный цикл
@@ -100,34 +100,55 @@
                 y - координата "Y"
                 player - объект Player (координаты X и Y)
                 destructible - разрушаемость блока
+                move - Смещение (Для полублоков)
+                hb_mode - режим полублока
+                through - проходимость через блок
                 id - индификатор для инвентаря
             methods:
                 __init__(self, x, y, player, texture=None) - инициализация атрибутов
                 update(self) - обнавление всего
-        
+                copy(self) - копирование себя
+                collision(self) - метод для разных блоков, срабатывает после прикосновения
+
         Grass(Block):
             id = 2
             Блок травы
-        
+
         Dirt(Block):
             id = 1
             Блок земли
-        
+
         Stone(Block):
             id = 3
             Блок камня
-        
+
         Bedrock(Block):
             id = 5
             блок бедрока (неломаемый)
-        
-        Cobblestone(Block):
+
+        CobbleStone(Block):
             id = 4
             блок булыжника
-        
+
         SlimeBlock(Block):
-            id = 6
+            id = 7
             блок слизи
+
+        CobbleStoneHB(Block):
+            id = 6
+            полублок булыжника
+
+        Fire(Block):
+            id = 8
+            Огонь
+
+        Wood(Block):
+            id = 9
+            Дерево
+
+        Leaves(Block):
+            id = 10
+            Листва
 
         Chank:
             attributes:
@@ -137,7 +158,7 @@
                 get_group(self) - возвращяет объект Group из pygame.sprite
                 change_pos(self, move_x=0, move_y=0) - смещает чанк по сетке чанков
                 copy(self) - возвращяет копию чанка и всех спрайтов в ней
-            
+
         Item:
             attributes:
                 image - изображение предмета
@@ -147,36 +168,49 @@
                 player - объект Player
                 name - Название предмета
                 change_y - изменитель переменной y
-                s - изменитель переменной change_y
                 take - этот предмет можно взять, если take == True
+                id - id предмета
             methods:
                 __init__(self, x, y, player, image, name, take) - инициализация атрибутов
-                update(self) - двигает предмет
+                update(self, chank, chank2, chanks) - проверяет предмет по чанкам
+                move(self, chank) - передвигает предмет
                 collision(self) - вызывается тогда, когда игрок каснётся предмета
 
         ItemGrass(Item):
             id = 2
             Предмет травы
-        
+
         ItemDirt(Item):
             id = 1
             Предмет земли
-        
+
         ItemStone(Item):
             id = 3
             Предмет камня
-        
+
         ItemBedrock(Item):
             id = 5
             Предмет бедрока (неломаемый)
-        
-        ItemCobblestone(Item):
+
+        ItemCobbleStone(Item):
             id = 4
             Предмет булыжника
-        
+
         ItemSlimeBlock(Item):
-            id = 6
+            id = 7
             Предмет блока слизи
+
+        ItemCobbleStoneHB(Item):
+            id = 6
+            Предмет полублока булыжника
+
+        ItemWood(Item):
+            id = 9
+            Предмет блока дерева
+
+        ItemLeaves(Item):
+            id = 10
+            Предмет блока листвы
 
         Mob:
             attributes:
@@ -274,8 +308,11 @@
 
 Файлы:
     files:
+        sounds: ... (unused)
         objects:
             items.txt
+            blocks.txt
+            player.txt
         textures:
             dirt.png
             stone.png
@@ -286,8 +323,6 @@
             hotslot.png
             steve.png
         __init__.py
-        blocks.txt
-        player.txt
     module:
         __init__.py
         docs.txt
@@ -316,6 +351,8 @@
     Текстуры v0.5
     Неполные блоки v0.6
     Инвентарь и хотбар (class HotBar, class Inventory) v0.6
+    Генерация мира ( method Main.generate() ) v0.7
+    v0.7 - исправленны баги (3)
 
 Делается:
-    Генерация мира ( method Main.generate() ) v0.7
+    Ничего ...

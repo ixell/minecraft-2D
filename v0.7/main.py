@@ -128,7 +128,7 @@ class Main:
         self.mobs.draw(self.screen)
         self.player.draw(self.screen)
         if not self.inventory.active: 
-            self.mouse.block()
+            self.mouse.draw()
             self.hotbar.draw()
         self.inventory.draw()
         pg.display.update()
@@ -163,5 +163,6 @@ class Main:
             self.clock.tick(FPS)
         pg.quit()
 
-game = Main()
-game.run()
+if __name__ == '__main__':
+    game = Main()
+    game.run()

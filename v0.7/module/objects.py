@@ -12,7 +12,7 @@ class Mouse:
         self.player = player
         self.chanks = chanks
 
-    def block(self):
+    def draw(self):
         mpos = pg.mouse.get_pos()
         pg.draw.rect(self.screen, self.good, ((mpos[0]-self.player.x%BSIZE)//BSIZE*BSIZE+self.player.x%BSIZE,
          (mpos[1]-self.player.y%BSIZE)//BSIZE*BSIZE+self.player.y%BSIZE, BSIZE, BSIZE), 4)
@@ -20,7 +20,6 @@ class Mouse:
     def select(self):
         mpos = list(pg.mouse.get_pos())
         chank = 56 - abs(((self.player.x-mpos[0]+self.player.rect.x)//BSIZE)//CSIZE+SPAWNCHANK)
-        print(chank)
         mpos[0] = ((mpos[0]-self.player.x%BSIZE)//BSIZE-self.player.x//BSIZE)*BSIZE
         mpos[1] = ((mpos[1]-self.player.y%BSIZE)//BSIZE-self.player.y//BSIZE)*BSIZE
         return self.chanks[chank].get_group(), mpos
@@ -135,7 +134,6 @@ class Player(pg.sprite.Sprite):
                 self.rots[k][1] = -self.rots[k][1]
 
     def sprites_move(self, pos):
-        # print('move:', pos)
         self.body.move(pos)
         self.head.move(pos)
         self.lleg.move(pos)
@@ -423,7 +421,7 @@ class Item(pg.sprite.Sprite):
         # self.rect.y = self.player.y + self.y
         self.grav(chank)
         self.y += self.change_y
-    
+
     def grav(self, chank):
         self.rect.y -= 8
         col = pg.sprite.spritecollide(self, chank, False)
