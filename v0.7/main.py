@@ -2,7 +2,6 @@ from module import *
 import pygame as pg
 import random
 
-
 class Main:
     def __init__(self):
         pg.init()
@@ -50,6 +49,8 @@ class Main:
         random.seed(seed)
         procent = random.randint(0, 100)
         wood_procent = random.randint(0, 100)
+        cave_procent = 0
+        caves = []
         add_y = 0
         for i in range(1, 60):
             block_list = []
@@ -66,6 +67,7 @@ class Main:
                 block_pos_list.append([x-CSIZE//2, 0])
                 block_list.append(5)
                 procent += random.randint(-2, 7)
+                cave_procent += random.randint(2, 8)
                 wood_procent += random.randint(2, 10)
                 if procent > 100: procent = 100
                 if wood_procent > 100: wood_procent = 100
@@ -85,6 +87,52 @@ class Main:
                                     block_pos_list.append(pos)
                                     block_list.append(10)
                         wood_procent = -30
+                if cave_procent - random.randint(1, 100) >= 0:
+                    cave_procent = 0
+                    caves.append([x-CSIZE//2, add_y+DEFAULT_Y, random.randint(1, 4), random.randint(25, 75), 0, random.randint(0, 100)])
+                    self.player.x = x + CSIZE * (len(self.chanks))
+                    print(len(caves))
+                for indx, cave_state in enumerate(caves):
+                    cave_state[0] += 1
+                    if cave_state[1] > DEFAULT_Y + add_y:
+                        del caves[indx]
+                        continue
+                    cave_state[5] += random.randint(-2, 4)
+                    if cave_state[5] - random.randint(1, 100) >= 0:
+                        if cave_state[2] > 4: cave_state[2] -= random.randint(1, 2)
+                        elif cave_state[2] <= 1: cave_state[2] += random.randint(1, 2)
+                        else: cave_state[2] += random.randint(-1, 1)
+                        cave_state[5] = random.randint(-5, 10)
+                    elif cave_state[1] >= (DEFAULT_Y+add_y) - 10:
+                        cave_state[3] += random.randint(2, 8)
+                        cave_state[4] += random.randint(1, 3)
+                    elif cave_state[1] > 7:
+                        cave_state[4] += random.randint(2, 8)
+                        cave_state[3] += random.randint(1, 3)
+                    else: cave_state[4] += random.randint(7, 12)
+                    for y in range(1, cave_state[2]+1):
+                        if [cave_state[0], y+cave_state[1]-cave_state[2]] in block_pos_list:
+                            index = block_pos_list.index([cave_state[0], y+cave_state[1]-cave_state[2]])
+                            if block_list[index] == 5: continue
+                            del block_pos_list[index]
+                            del block_list[index]
+                        # print(block_pos_list[indx])
+                            print([cave_state[0], y+cave_state[1]-cave_state[2]])
+                            # print(y, cave_state[1], cave_state[2])
+                        # pg.time.delay(200)
+                            # block_list[index] = 4
+                    if cave_state[3] - random.randint(1, 100) >= 0:
+                        if cave_state[3] <= 10: cave_state[1] -= 1
+                        elif 10 < cave_state[3] <= 20: cave_state[1] -= 2
+                        elif 20 < cave_state[3] <= 40: cave_state[1] -= 3
+                        elif cave_state[3] > 40: cave_state[1] -= 4
+                        cave_state[3] -= 10
+                    if cave_state[4] - random.randint(1, 100) >= 0:
+                        if cave_state[4] <= 10: cave_state[1] += 1
+                        elif 10 < cave_state[4] <= 20: cave_state[1] += 2
+                        elif 20 < cave_state[4] <= 40: cave_state[1] += 3
+                        elif cave_state[4] > 40: cave_state[4] += 4
+                        cave_state[4] -= 10
                 if random.randint(1, 100) - procent <= 0:
                     if add_y >= 6: add = -1
                     elif add_y <= 0: add = 1

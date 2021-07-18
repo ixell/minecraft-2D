@@ -156,7 +156,7 @@ class Player(pg.sprite.Sprite):
     def update(self, chank, chank2):
         self.move(chank)
         cmpos = self.collision(chank2, (False, False))
-        cmpos = cmpos[0] != 0, cmpos[1] != 0
+        cmpos = abs(cmpos[0]) == self.speed, cmpos[1] != 0
         self.collision(chank, cmpos)
         self.change_x = 0
 
@@ -591,7 +591,7 @@ class Mob(pg.sprite.Sprite):
         self.x -= x
         self.y += y
 
-    def grav(self, chank):
+    def grav(self):
         if self.change_y == 0:
             self.change_y = -1
         else:
