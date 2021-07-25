@@ -351,7 +351,8 @@ class SlimeBlock(Block):
         super().__init__(x, y, player, image, 7)
 
     def collision(self, mob, coord):
-        if 'y' in coord: mob.change_y = (mob.change_y - 1) * -0.5
+        print((mob.change_y - mob.change_y / 7) * -0.5 - 1)
+        if 'y' in coord: mob.change_y = (mob.change_y - 2 - mob.change_y / 7) * -0.5 - 1
         return True
 
 class Fire(Block):
